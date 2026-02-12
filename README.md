@@ -21,63 +21,59 @@ To write a program to implement the the Logistic Regression Using Gradient Desce
 DEVELOPED BY: PAARKAVI A
 REF NO: 25012275
 
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-
-data = pd.read_csv("Placement_Data.csv")
-
-data['status'] = data['status'].map({'Placed': 1, 'Not Placed': 0})
-
-X = data[['ssc_p', 'mba_p']].values
-y = data['status'].values
-
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
-
-m = len(y)
-X = np.c_[np.ones(m), X]
-
+import numpy as np
+data=pd.read_csv("Placement_Data.csv")
+data.head()
+data1=data.copy()
+data1.head()
+data1=data.drop(['sl_no','salary'],axis=1)
+data1
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+data1["gender"]=le.fit_transform(data1["gender"])
+data1["ssc_b"]=le.fit_transform(data1["ssc_b"])
+data1["hsc_b"]=le.fit_transform(data1["hsc_b"])
+data1["hsc_s"]=le.fit_transform(data1["hsc_s"])
+data1["degree_t"]=le.fit_transform(data1["degree_t"])
+data1["workex"]=le.fit_transform(data1["workex"])
+data1["specialisation"]=le.fit_transform(data1["specialisation"])
+data1["status"]=le.fit_transform(data1["status"])
+X=data1.iloc[:,: -1]
+Y=data1["status"]
+theta=np.random.randn(X.shape[1])
+y=Y
 def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-def cost_function(X, y, theta):
-    h = sigmoid(X @ theta)
-    return (-1/m) * np.sum(y*np.log(h) + (1-y)*np.log(1-h))
-
-theta = np.zeros(X.shape[1])
-alpha = 0.1
-cost_history = []
-
-for i in range(500):
-    z = X @ theta
-    h = sigmoid(z)
-    gradient = (1/m) * X.T @ (h - y)
-    theta = theta - alpha * gradient
-    
-    cost = cost_function(X, y, theta)
-    cost_history.append(cost)
-
-y_pred = (sigmoid(X @ theta) >= 0.5).astype(int)
-
-accuracy = np.mean(y_pred == y) * 100
-print("Weights:", theta)
-print("Accuracy:", accuracy, "%")
-
-plt.figure()
-plt.plot(cost_history)
-plt.xlabel("Iterations")
-plt.ylabel("Cost")
-plt.title("Logistic Regression using Gradient Descent")
-plt.show()
+  return 1/(1+np.exp(-z))
+def loss(theta,X,y):
+  h=sigmoid(X.dot(theta))
+  return -np.sum(y*np.log(h)+ (1-y) * np.log(1-h))
+def gradient_descent(theta,X,y,alpha,num_iterations):
+  m=len(y)
+  for i in range(num_iterations):
+    h=sigmoid(X.dot(theta))
+    gradient=X.T.dot(h-y)/m
+    theta-=alpha*gradient
+  return theta
+theta=gradient_descent(theta,X,y,alpha=0.01,num_iterations=1000)
+def predict(theta,X):
+  h=sigmoid(X.dot(theta))
+  y_pred=np.where(h>=0.5 , 1,0)
+  return y_pred
+y_pred=predict(theta,X)
+accuracy=np.mean(y_pred.flatten()==y)
+print("Accuracy:",accuracy)
+print("Predicted:\n",y_pred)
+print("Actual:\n",y.values)
+xnew=np.array([[0,87,0,95,0,2,78,2,0,0,1,0]])
+y_prednew=predict(theta,xnew)
+print("Predicted Result:",y_prednew)
 ```
+
 ## Output:
-```
-Weights: [ 1.26712229  2.20688701 -0.59115221]
-Accuracy: 82.32558139534883 %
-```
-<img width="883" height="593" alt="image" src="https://github.com/user-attachments/assets/2d643435-1163-4730-ac59-8e90b01181dc" />
+
+<img width="761" height="359" alt="Screenshot 2026-02-06 103022" src="https://github.com/user-attachments/assets/70832d3b-bab2-42d0-ab21-34844a17ab72" />
+
 
 ## Result:
 Thus the program to implement the the Logistic Regression Using Gradient Descent is written and verified using python programming.
